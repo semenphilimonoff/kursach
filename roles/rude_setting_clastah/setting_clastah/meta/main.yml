@@ -1,0 +1,9 @@
+dependencies:
+  - { role: hard_setting_clastah/clastah_limits}
+  - { role: hard_setting_clastah/clastah_packs,
+    clastah_add_packages_repositories: "{{ clastah_adding_repo }}",
+    clastah_add_packages_keys: "{{ clastah_adding_keys }}",
+    clastah_add_packages_names: "{{ clastah_getting_packs }}",
+    clastah_remove_packages_names: "{{ clastah_removing_packs }}",
+    upgrade_all: false
+    }

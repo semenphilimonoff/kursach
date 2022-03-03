@@ -1,0 +1,13 @@
+- name: adding bitnami repo
+  community.kubernetes.helm_repository:
+    name: bitnami
+    repo_url: "https://charts.bitnami.com/bitnami"
+
+- name: deploing wordpress
+  community.kubernetes.helm:
+    name: wordpress
+    release_namespace: wordpress
+    create_namespace: yes
+    chart_ref: bitnami/wordpress
+    values: "{{ lookup('template', 'wordpress.yaml') | from_yaml }}"
+

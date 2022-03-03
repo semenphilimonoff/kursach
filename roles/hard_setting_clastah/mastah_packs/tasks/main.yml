@@ -1,0 +1,48 @@
+- name: adding keys
+  apt_key:
+    url='{{item.key}}'
+  with_items: "{{ mastah_add_packages_keys }}"
+  when: mastah_add_packages_keys is defined and not (mastah_add_packages_keys is none or mastah_add_packages_keys | trim == '')
+  register: aptnewkeys
+
+- name: adding repo
+  apt_repository:
+    repo='{{item.repo}}'
+  with_items: "{{ mastah_add_packages_repositories }}"
+  when: mastah_add_packages_repositories is defined and not (mastah_add_packages_repositories is none or mastah_add_packages_repositories | trim == '')
+
+- name: updating cache
+  set_fact:
+        mastah_add_packages_cache_valid_time: 0
+  when: aptnewkeys.changed
+
+- name: removing packs
+  apt:
+    name={{ item.name }}
+    state=absent
+  with_items: "{{ mastah_remove_packages_names }}"
+  when: mastah_remove_packages_names is defined and not (mastah_remove_packages_names is none or mastah_remove_packages_names | trim == '')
+
+- name: getting packs
+  apt:
+    name={{ item.name }}
+    state=present
+    update_cache=yes
+    cache_valid_time={{mastah_add_packages_cache_valid_time}}
+  with_items: "{{ mastah_add_packages_names }}"
+  when: mastah_add_packages_names is defined and not (mastah_add_packages_names is none or mastah_add_packages_names | trim == '')
+
+- name: upgrading pip
+  pip:
+    name: pip
+    executable: pip3
+    extra_args: --upgrade
+
+- name: getting pip modules
+  pip:
+    executable: pip3
+    name:
+      - kubernetes
+      - openshift
+
+

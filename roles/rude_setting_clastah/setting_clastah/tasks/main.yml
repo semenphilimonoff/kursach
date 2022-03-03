@@ -1,0 +1,62 @@
+- name: killing swap
+  lineinfile:
+    dest: /etc/fstab
+    regexp: '^/[\S]+\s+none\s+swap '
+    state: absent
+
+- name: swapoff
+  command: swapoff -a
+
+- name: removing swapfile
+  mount:
+    name: "{{ item }}"
+    fstype: swap
+    state: absent
+  with_items:
+    - swap
+    - none
+
+- name: getting containerd.conf
+  template:
+     src: etc/modules-load.d/containerd.conf
+     dest: /etc/modules-load.d/containerd.conf
+
+- name: getting containerd kernel
+  modprobe:
+    name: "{{ item.name }}"
+    state: present
+  loop: "{{ clastah_modprobe }}"
+
+- name: setting kubernetes-cri
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  loop: "{{ clastah_sysctl }}"
+
+- name: getting containerd/config.toml
+  template:
+    src: etc/containerd/config.toml
+    dest: /etc/containerd/config.toml
+  notify:
+    - restarting containerd
+    - restarting docker
+
+- name: setting node-ip {{ clastah_public_ip }}
+  lineinfile:
+    path: '/etc/systemd/system/kubelet.service.d/10-kubeadm.conf'
+    line: 'Environment="KUBELET_EXTRA_ARGS=--node-ip={{ clastah_public_ip }}"'
+    regexp: 'KUBELET_EXTRA_ARGS='
+    insertafter: '\[Service\]'
+    state: present
+  notify: restarting kubelet
+
+
+- name: removing config.toml
+  file:
+    state: absent
+    path:  /etc/containerd/config.toml
+
+- name: restarting services
+  meta: flush_handlers

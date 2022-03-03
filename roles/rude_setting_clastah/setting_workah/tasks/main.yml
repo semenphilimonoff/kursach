@@ -1,0 +1,17 @@
+- name: getting joinfile {{ clastah_name }}
+  copy:
+    src: "./{{ clastah_name }}-join-command"
+    dest: /home/{{ workah_admin_user }}/{{ clastah_name }}-join-command
+    owner: "{{ workah_admin_user }}"
+    group: "{{ workah_admin_group }}"
+    mode: 0760
+
+- name: workah joining {{ clastah_name }}
+  command: sh /home/{{ workah_admin_user }}/{{ clastah_name }}-join-command
+  register: workahjoin
+
+- name: creating storage directory
+  file:
+      path: /mnt/storage
+      state: directory
+  when: workahjoin.changed

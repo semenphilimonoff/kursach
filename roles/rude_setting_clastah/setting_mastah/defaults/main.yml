@@ -1,0 +1,25 @@
+mastah_admin_user:  "vagrant"
+mastah_admin_group: "vagrant"
+mastah_node_name: "mastah-1"
+clastah_name:     "clastah"
+clastah_apiserver_advertise_address: "192.168.56.11"
+clastah_pod_network_cidr: "192.168.0.0/16"
+
+mastah_adding_keys:
+  - key: https://baltocdn.com/helm/signing.asc
+
+mastah_adding_repo:
+  - repo: "deb https://baltocdn.com/helm/stable/debian/ all main"
+
+mastah_getting_packs:
+  - name: helm
+  - name: python3-pip
+
+mastah_removing_packs:
+  - name:
+
+persistence_config:
+  - name: db-storage.yaml
+  - name: local-storage.yaml
+  - name: pv-db-storage.yaml
+  - name: pv-local-storage.yaml

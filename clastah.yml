@@ -1,0 +1,14 @@
+- hosts: mastah-*
+  become: yes
+  roles:
+    - { role: rude_setting_clastah/setting_mastah}
+
+- hosts: workah-*
+  become: yes
+  roles:
+    - { role: rude_setting_clastah/setting_workah}
+
+- hosts: mastah-*
+  become: yes
+  roles:
+    - { role: hard_setting_clastah/clastah_apps}

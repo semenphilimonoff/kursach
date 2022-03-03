@@ -1,0 +1,46 @@
+- name: checking admin.conf
+  stat:
+    path: /etc/kubernetes/admin.conf
+    get_attributes: no
+  register: clastahconfig
+
+- name: initing clastah
+  command: kubeadm init --apiserver-advertise-address=192.168.56.11 --node-name=mastah-1 --pod-network-cidr=192.168.0.0/16
+  args:
+    creates: /etc/kubernetes/admin.conf
+  when: not clastahconfig.stat.exists
+  register: clastahinit
+
+- name: creating ~/.kube for root
+  file:
+      path: /root/.kube
+      state: directory
+  when: clastahinit.changed
+
+- name: getting admin.conf for root
+  command: cp /etc/kubernetes/admin.conf /root/.kube/config
+  changed_when: false
+
+- name: installing calico
+  command: kubectl create -f https://projectcalico.docs.tigera.io/manifests/calico.yaml
+  when: clastahinit.changed
+
+- name: generating join command
+  command: kubeadm token create --print-join-command
+  register: join_command
+  changed_when: no
+  run_once: yes
+
+- name: getting joinfile for {{ clastah_name }}
+  become: false
+  local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./{{ clastah_name }}-join-command"
+
+- name: getting storage config
+  copy:
+    src: "{{ item.name }}"
+    dest: /home/vagrant
+  with_items: "{{ persistence_config }}"
+
+- name: setting storage config
+  command: kubectl apply -f "{{ item.name }}"
+  with_items: "{{ persistence_config }}"

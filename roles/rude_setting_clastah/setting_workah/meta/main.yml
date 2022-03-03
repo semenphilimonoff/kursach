@@ -1,0 +1,5 @@
+dependencies:
+  - { role: rude_setting_clastah/setting_clastah,
+      clastah_admin_user: "{{workah_admin_user}}",
+      clastah_admin_group: "{{workah_admin_group}}"
+    }

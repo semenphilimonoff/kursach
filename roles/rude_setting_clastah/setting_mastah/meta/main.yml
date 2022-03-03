@@ -1,0 +1,12 @@
+dependencies:
+  - { role: rude_setting_clastah/setting_clastah,
+      clastah_admin_user: "{{mastah_admin_user}}",
+      clastah_admin_group: "{{mastah_admin_group}}"
+    }
+  - { role: hard_setting_clastah/mastah_packs,
+      mastah_add_packages_repositories: "{{ mastah_adding_repo }}",
+      mastah_add_packages_keys: "{{ mastah_adding_keys }}",
+      mastah_add_packages_names: "{{ mastah_getting_packs }}",
+      mastah_remove_packages_names: "{{ mastah_removing_packs }}",
+      upgrade_all: false
+    }
